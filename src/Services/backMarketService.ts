@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-const backMarketBaseUrl = 'https://api.backmarket.fr';
+const backMarketBaseUrl = 'https://preprod.backmarket.fr';
 
 const createOrder = async (order: any) => {
+    console.log(process.env.BACKMARKET_API_KEY);
     await axios.post(`${backMarketBaseUrl}/orders`, order, {
         headers: { Authorization: `Bearer ${process.env.BACKMARKET_API_KEY}` }
     });
@@ -24,4 +25,4 @@ const updateStock = async (sku: string, quantity: number) => {
     });
 };
 
-export default { createOrder, updateOrderTracking, updateStock };
+export default { createOrder, updateOrderTracking, updateStock }; 

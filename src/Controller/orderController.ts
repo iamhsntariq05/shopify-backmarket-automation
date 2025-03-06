@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import shopifyService from '../Services/shopifyService';
 import backmarketService from '../Services/backMarketService';
 
+
+// import new order as soon as they appear!
 export const importOrder = async (req: Request, res: Response) => {
     try {
         const order = req.body;
@@ -14,6 +16,7 @@ export const importOrder = async (req: Request, res: Response) => {
     }
 };
 
+// orders that are marked as sent and have tracking number
 export const updateOrderStatus = async (req: Request, res: Response) => {
     try {
         const { orderId, trackingNumber } = req.body;
@@ -25,6 +28,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     }
 };
 
+// Cancelled orders in Back Market should also be cancelled in Shopify
 export const cancelOrder = async (req: Request, res: Response) => {
     try {
         const { orderId } = req.body;
