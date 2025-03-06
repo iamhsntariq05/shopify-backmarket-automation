@@ -1,0 +1,8 @@
+    # Directories...
+    node_modules
+    # Files...
+    .env
+    backend_api.log.gz
+    *.log
+    *.log.gz
+node_modules
