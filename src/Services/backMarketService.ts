@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { BACKMARKET_API_URL, BACKMARKET_HEADERS } from "../Config/index";
+import { BACKMARKET_API_URL, BACKMARKET_HEADERS,SHOPIFY_API_URL,SHOPIFY_HEADERS } from "../Config/index";
 import { shopify } from '../index';
 
 
@@ -122,6 +122,48 @@ const updateBackMarketOrderStatus = async (
     }
   };
 
+  export const getCanceledBackMarketOrders = async () => {
+    try {
+      const response = await axios.get(`${BACKMARKET_API_URL}/ws/orders?status=canceled`, {
+        headers: BACKMARKET_HEADERS,
+      });
+  
+      return response.data.results || [];
+    } catch (error: any) {
+      console.error("Error fetching canceled orders from BackMarket:", error.message);
+      return [];
+    }
+  };
+  
+  
+  export const cancelShopifyOrder = async (shopifyOrderId: string) => {
+    try {
+      const response = await axios.post(
+        `${SHOPIFY_API_URL}/orders/${shopifyOrderId}/cancel.json`,
+        {},
+        { headers: SHOPIFY_HEADERS }
+      );
+  
+      return response.data;
+    } catch (error: any) {
+      console.error(`Error canceling Shopify order ${shopifyOrderId}:`, error.message);
+      return { success: false, message: "Error canceling Shopify order" };
+    }
+  };
+  
+
+  export const syncCanceledOrders = async () => {
+    const canceledOrders = await getCanceledBackMarketOrders();
+  
+    for (const order of canceledOrders) {
+      const shopifyOrderId = order.shopify_order_id; 
+  
+      if (shopifyOrderId) {
+        console.log(`Canceling order ${shopifyOrderId} in Shopify...`);
+        await cancelShopifyOrder(shopifyOrderId);
+      }
+    }
+  };
 
 // export default { getOrder, updateOrderTracking, updateStock,syncShopifyInventoryWithBackMarket,updateBackMarketOrderStatus }; 
 export default { getOrder, updateBackMarketOrderStatus };

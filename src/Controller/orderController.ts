@@ -1,6 +1,7 @@
 import { Request, Response,NextFunction } from 'express';
-import shopifyService from '../Services/shopifyService';
+// import shopifyService from '../Services/shopifyService';
 import backmarketService from '../Services/backMarketService';
+import { syncCanceledOrders } from "../Services/backMarketService";
 
 
 // import new order as soon as they appear!
@@ -35,6 +36,20 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
   
      res.json({ success: true, message: "Order updated successfully", data: result });
   };
+
+
+// Cancelled orders in Back Market should also be cancelled in Shopify
+  export const syncCanceledOrdersController = async (req: Request, res: Response) => {
+    try {
+      await syncCanceledOrders();
+      res.json({ success: true, message: "Sync process completed" });
+    } catch (error: any) {
+      console.error("Error syncing canceled orders:", error.message);
+      res.status(500).json({ success: false, message: "Error syncing canceled orders" });
+    }
+  };
+
+  
 
 
 
