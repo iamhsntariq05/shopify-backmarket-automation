@@ -4,9 +4,7 @@ import cors from 'cors';
 import Shopify from 'shopify-api-node';
 import dotenv from 'dotenv';
 import routes from './Routes'
-import fulfillmentRoutes from './Routes/';
-
-// import { notFoundHandler } from './Middleware'
+import {notFoundErrorHandle} from './Middleware/'
 
 
 dotenv.config();
@@ -14,7 +12,6 @@ dotenv.config();
 const app: Application = express();
 app.use(cors());
 app.use(bodyParser.json());
-// app.use(fulfillmentRoutes);
 
 
 export const shopify = new Shopify({
@@ -23,8 +20,8 @@ export const shopify = new Shopify({
     password: process.env.SHOPIFY_PASSWORD as string
   });
 
+app.use('*', notFoundErrorHandle);
 app.use('/BM', routes)
-// app.use(notFoundHandler);
 
 
 

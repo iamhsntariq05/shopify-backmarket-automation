@@ -8,8 +8,6 @@ const handleInventoryUpdate = async (req: Request, res: Response) => {
     try {
       const { inventory_item_id, available } = req.body;
   
-      console.log(`🔄 Webhook received: Inventory ID: ${inventory_item_id}, Available: ${available}`);
-  
       await webhookService.updateInventory(inventory_item_id, available);
   
       res.status(200).json({ success: true, message: "Inventory update processed." });

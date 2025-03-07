@@ -90,13 +90,11 @@ const cancelOrder = async (orderId: string) => {
   const updateInventory = async (inventoryItemId: number, shopifyQuantity: number) => {
     const shopifySku = await getShopifySku(inventoryItemId);
     if (!shopifySku) {
-      console.warn(`⚠️ No SKU found for inventory_item_id: ${inventoryItemId}`);
-      return;
+      return {
+        success: false,
+        message: "No SKU found for inventory item",
+      };
     }
-  
-    console.log(`📦 Updating inventory for SKU: ${shopifySku}, New Quantity: ${shopifyQuantity}`);
-  
-    // Map Shopify SKU to BackMarket SKU and update inventory
     await mapShopifySkuToBackMarketSkus(shopifySku, shopifyQuantity);
   };
   
