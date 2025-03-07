@@ -14,7 +14,7 @@ const InventoryUpdate = async (req: Request, res: Response) => {
       }
       res.status(200).json({ success: response?.success, message: response?.message });
     } catch (error) {
-      console.error("❌ Error processing webhook:", error);
+      console.error(" Error processing webhook:", error);
       res.status(500).json({ success: false, message: "Error processing inventory update." });
     }
   };

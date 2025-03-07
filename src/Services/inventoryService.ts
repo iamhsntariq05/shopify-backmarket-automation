@@ -38,7 +38,7 @@ const cancelOrder = async (orderId: string) => {
 
       return response.data.inventory_item.sku || null;
     } catch (error) {
-      console.error("❌ Failed to fetch SKU from Shopify:", error);
+      console.error("Failed to fetch SKU from Shopify:", error);
       return null;
     }
   }
@@ -75,10 +75,18 @@ const cancelOrder = async (orderId: string) => {
 
   const getShopifySku = async (inventoryItemId: number): Promise<string | null> => {
     const shopifyAccessToken = process.env.SHOPIFY_ACCESS_TOKEN;
-    const shopifyUrl = `${process.env.SHOPIFY_API_URL}/admin/api/2023-01/inventory_items/${inventoryItemId}.json`;
+    const shopifyUrl = `${process.env.SHOPIFY_API_URL}/admin/api/2024-01/inventory_items/${inventoryItemId}.json`;
     try {
+
+      if (!process.env.SHOPIFY_ACCESS_TOKEN || !process.env.SHOPIFY_API_URL) {
+        console.error("Missing Shopify API credentials in .env");
+        return null;
+      }
       const response = await axios.get(shopifyUrl, {
-        headers: { "X-Shopify-Access-Token": shopifyAccessToken },
+        headers: {
+           "X-Shopify-Access-Token": shopifyAccessToken,
+           "Content-Type": "application/json",
+           },
       });
       if(response){
         console.log("response",response);
@@ -110,7 +118,7 @@ const cancelOrder = async (orderId: string) => {
       });
   
       if (response.data.count === 0) {
-        console.warn(`⚠️ No BackMarket products found for SKU: ${shopifySku}`);
+        console.warn(`No BackMarket products found for SKU: ${shopifySku}`);
         return;
       }
   
@@ -132,9 +140,9 @@ const cancelOrder = async (orderId: string) => {
         { headers: { Authorization: `Bearer ${process.env.BACKMARKET_ACCESS_TOKEN}` } }
       );
   
-      console.log(`✅ Inventory updated for BackMarket Product ID: ${productId}`);
+      console.log(`Inventory updated for BackMarket Product ID: ${productId}`);
     } catch (error) {
-      console.error(`❌ Failed to update inventory for Product ID: ${productId}`, error);
+      console.error(`Failed to update inventory for Product ID: ${productId}`, error);
     }
   };
 
