@@ -1,0 +1,87 @@
+# Shopify BackMarket Integration
+
+### ->Overview
+
+This project is a Node.js backend service that integrates with BackMarket to fetch and manage orders. It provides a RESTful API to import orders from BackMarket and return the data in a structured response.
+
+### ->Features
+
+Fetches order data from BackMarket.
+
+### -> Installation
+
+Clone the repository:
+
+*git clone https://github.com/your-repo.git*
+*cd your-repo*
+
+Install dependencies:
+
+*npm install*
+
+Set up your .env file with required environment variables: 
+**SHOPIFY_API_URL=https://yourshopifystore.myshopify.com**
+**BACKMARKET_API_KEY=your-api-key**
+
+### -> API Endpoints
+#### Import Order
+
+**Endpoint**: POST /api/import-order
+
+Description: Fetches order data from BackMarket and returns it.
+Request Example:
+*curl -X POST http://localhost:3000/api/import-order*
+
+Response Example:
+{
+  "message": "Order imported to BackMarket",
+  "data": { ...orderDetails }
+}
+
+#### Update Order Status
+
+**Endpoint**: POST /api/orders/update-status
+
+Description: Updates the order status in BackMarket using the Shopify order ID and tracking number.
+
+Request Body:{
+  "shopifyOrderId": "1234567890",
+  "trackingNumber": "TRACK12345"
+}
+
+Response:{
+  "success": true,
+  "message": "Order updated successfully",
+  "data": {...}
+}
+
+#### Sync Canceled Orders
+
+**Endpoint**:POST /api/orders/sync-canceled
+
+Description: Ensures that orders canceled in BackMarket are also marked as canceled in Shopify.
+
+Response:{
+  "success": true,
+  "message": "Sync process completed"
+}
+
+#### Update Inventory Stock
+
+***Endpoint***: POST /api/inventory/shopify-inventory
+
+Description: Syncs inventory stock between Shopify and BackMarket when Shopify stock changes.
+
+Response:{
+  "success": true,
+  "message": "Sync Inventory"
+}
+
+### Contribution
+
+Feel free to submit issues and pull requests to improve this project.
+
+### License
+
+This project is licensed under the MIT License.
+
