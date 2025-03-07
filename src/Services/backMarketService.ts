@@ -165,5 +165,4 @@ const updateBackMarketOrderStatus = async (
     }
   };
 
-// export default { getOrder, updateOrderTracking, updateStock,syncShopifyInventoryWithBackMarket,updateBackMarketOrderStatus }; 
 export default { getOrder, updateBackMarketOrderStatus };

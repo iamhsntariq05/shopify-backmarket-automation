@@ -1,4 +1,21 @@
 import { Request, Response } from 'express';
-import backmarketService from '../Services/backMarketService';
+import webhookService from "../Services/shopifyService";
+
 
 //update inventory stock quantity when shopify stock quantity is changed
+
+const handleInventoryUpdate = async (req: Request, res: Response) => {
+    try {
+      const { inventory_item_id, available } = req.body;
+  
+      console.log(`🔄 Webhook received: Inventory ID: ${inventory_item_id}, Available: ${available}`);
+  
+      await webhookService.updateInventory(inventory_item_id, available);
+  
+      res.status(200).json({ success: true, message: "Inventory update processed." });
+    } catch (error) {
+      console.error("❌ Error processing webhook:", error);
+      res.status(500).json({ success: false, message: "Error processing inventory update." });
+    }
+  };
+  export default handleInventoryUpdate;
