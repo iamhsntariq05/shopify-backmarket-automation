@@ -24,12 +24,6 @@ export const BACKMARKET_HEADERS = {
     "Content-Type": "application/json",
   };
 
-  export const shopify = new Shopify({
-    shopName: process.env.SHOPIFY_STORE_NAME as string,
-    apiKey:  process.env.SHOPIFY_API_KEY as string,
-    password: process.env.SHOPIFY_PASSWORD as string
-  });
-  
 
 
 

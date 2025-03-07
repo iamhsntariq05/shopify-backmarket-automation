@@ -1,7 +1,7 @@
-require('dotenv').config();
+import dotenv from "dotenv";
 import axios from 'axios';
 
-const shopifyBaseUrl = `https://${process.env.SHOPIFY_STORE_NAME}.myshopify.com/admin/api/2023-01`;
+dotenv.config();
 
 const mapOrderToBackMarket = (order: any) => {
     return {
@@ -14,14 +14,7 @@ const mapOrderToBackMarket = (order: any) => {
     };
 };
 
-const cancelOrder = async (orderId: string) => {
-    await axios.post(`${shopifyBaseUrl}/orders/${orderId}/cancel.json`, {}, {
-        auth: {
-            username: process.env.SHOPIFY_API_KEY || '',
-            password: process.env.SHOPIFY_PASSWORD || ''
-        }
-    });
-};
+
 
 
     const getShopifyProductSku = async (inventoryItemId: string) => {
@@ -54,9 +47,8 @@ const cancelOrder = async (orderId: string) => {
           headers: { Authorization: `Bearer ${process.env.BACKMARKET_API_KEY}` },
         }
       );
-      console.log(`✅ Updated BackMarket stock for SKU: ${sku} to quantity: ${quantity}`);
     } catch (error) {
-      console.error(`❌ Error updating BackMarket stock for SKU: ${sku}`, error);
+      console.error(`Error updating BackMarket stock for SKU: ${sku}`, error);
     }
   }
 
@@ -88,13 +80,14 @@ const cancelOrder = async (orderId: string) => {
            "Content-Type": "application/json",
            },
       });
-      if(response){
-        console.log("response",response);
-      }
   
       return response.data.inventory_item.sku;
     } catch (error) {
-      console.error("Error fetching SKU:", error);
+      if (axios.isAxiosError(error)) {
+        console.error("Axios error response:", error.response?.data);
+      } else {
+        console.error("Unexpected error:", error);
+      }
       return null;
     }
   };
@@ -148,4 +141,4 @@ const cancelOrder = async (orderId: string) => {
 
 
 
-export default { mapOrderToBackMarket, cancelOrder, syncInventoryWithBackMarket,updateInventory};
+export default { mapOrderToBackMarket, syncInventoryWithBackMarket,updateInventory};

@@ -25,60 +25,6 @@ const getOrder = async () => {
       }
 };
 
-// const updateOrderTracking = async (orderId: string, trackingNumber: string, trackingUrl: string) => {
-//     const response = await axios.put(`${process.env.BACKMARKET_API_URL}/orders/${orderId}/tracking`, {
-//         tracking_number: trackingNumber,
-//         tracking_url: trackingUrl
-
-//     }, {
-//         headers: { Authorization: `Bearer ${process.env.BACKMARKET_API_KEY}` }
-//     });
-//     if (response.status === 204 || !response.data) {
-//             return { message: "No data to update" };
-//         }
-
-// };
-
-// const updateStock = async (sku: string, quantity: number) => {
-//     await axios.put(`${process.env.BACKMARKET_API_URL}/inventory/${sku}`, {
-//         quantity: quantity
-//     }, {
-//         headers: { Authorization: `Bearer ${process.env.BACKMARKET_API_KEY}` }
-//     });
-// };
-
-// const syncShopifyInventoryWithBackMarket = async () => {
-//     try {
-//         const products = await shopify.product.list();
-
-//         if (products.length === 0) {
-//             console.warn("No products found in Shopify.");
-//             return;
-//         }
-
-//         await Promise.all(products.map(async (product: any) => {
-//             const variant = product.variants[0];
-
-//             if (!variant || !variant.sku) {
-//                 console.log(`⚠️ Missing SKU for product: ${product.title}`);
-//                 return;
-//             }
-
-//             const shopifySku = variant.sku;
-//             const shopifyQuantity = variant.inventory_quantity;
-
-//             console.log(`🔄 Syncing SKU: ${shopifySku} with quantity: ${shopifyQuantity}`);
-            
-//             await updateStock(shopifySku, shopifyQuantity);
-//         }));
-
-//         console.log("✅ Inventory sync process completed.");
-//     } catch (error) {
-//         console.error("❌ Error syncing inventory:", error);
-//     }
-// };
-
-
 const updateBackMarketOrderStatus = async (
     shopifyOrderId: string,
     trackingNumber: string
@@ -159,7 +105,6 @@ const updateBackMarketOrderStatus = async (
       const shopifyOrderId = order.shopify_order_id; 
   
       if (shopifyOrderId) {
-        console.log(`Canceling order ${shopifyOrderId} in Shopify...`);
         await cancelShopifyOrder(shopifyOrderId);
       }
     }

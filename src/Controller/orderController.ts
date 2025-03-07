@@ -26,15 +26,18 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
         success: false,
         message: "Missing shopifyOrderId or trackingNumber",
       });
+      return;
     }
   
     const result = await backmarketService.updateBackMarketOrderStatus(shopifyOrderId, trackingNumber);
   
     if (result.success === false) {
        res.status(404).json(result);
+       return;
     }
   
      res.json({ success: true, message: "Order updated successfully", data: result });
+     return;
   };
 
 
