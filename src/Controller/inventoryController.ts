@@ -8,9 +8,11 @@ const handleInventoryUpdate = async (req: Request, res: Response) => {
     try {
       const { inventory_item_id, available } = req.body;
   
-      await webhookService.updateInventory(inventory_item_id, available);
-  
-      res.status(200).json({ success: true, message: "Inventory update processed." });
+      const response = await webhookService.updateInventory(inventory_item_id, available);
+      if(!response?.success){
+        res.status(404).json({ success: response?.success, message: response?.message });
+      }
+      res.status(200).json({ success: response?.success, message: response?.message });
     } catch (error) {
       console.error("❌ Error processing webhook:", error);
       res.status(500).json({ success: false, message: "Error processing inventory update." });

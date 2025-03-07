@@ -1,3 +1,4 @@
+require('dotenv').config();
 import axios from 'axios';
 
 const shopifyBaseUrl = `https://${process.env.SHOPIFY_STORE_NAME}.myshopify.com/admin/api/2023-01`;
@@ -79,6 +80,9 @@ const cancelOrder = async (orderId: string) => {
       const response = await axios.get(shopifyUrl, {
         headers: { "X-Shopify-Access-Token": shopifyAccessToken },
       });
+      if(response){
+        console.log("response",response);
+      }
   
       return response.data.inventory_item.sku;
     } catch (error) {

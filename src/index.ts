@@ -20,10 +20,10 @@ export const shopify = new Shopify({
     password: process.env.SHOPIFY_PASSWORD as string
   });
 
-app.use('*', notFoundErrorHandle);
-app.use('/BM', routes)
-
-
+  app.use('/BM', routes)
+  app.get("/", (req: any, res: any) => res.send("API is running..."));
+  
+  app.use('*', notFoundErrorHandle);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -1,10 +1,10 @@
 # Shopify BackMarket Integration
 
-### ->Overview
+### -> Overview
 
-This project is a Node.js backend service that integrates with BackMarket to fetch and manage orders. It provides a RESTful API to import orders from BackMarket and return the data in a structured response.
+This project integrates Shopify and BackMarket to synchronize order statuses, cancellations, and inventory stock updates.
 
-### ->Features
+### -> Features
 
 Fetches order data from BackMarket.
 
@@ -77,11 +77,11 @@ Response:{
   "message": "Sync Inventory"
 }
 
-### Contribution
+### -> Contribution
 
 Feel free to submit issues and pull requests to improve this project.
 
-### License
+### -> License
 
 This project is licensed under the MIT License.
 
