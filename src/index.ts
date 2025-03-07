@@ -4,9 +4,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import routes from './Routes'
 import {notFoundErrorHandle} from './Middleware/'
-import { VercelRequest, VercelResponse } from "@vercel/node";
-
-
 
 dotenv.config();
 
@@ -23,7 +20,7 @@ app.use(bodyParser.json());
 
 const PORT = process.env.PORT || 3000;
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
-  res.status(200).json({ message: "Hello from Vercel!" });
-}
+
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+export default app;
