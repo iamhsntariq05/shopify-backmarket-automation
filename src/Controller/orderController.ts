@@ -1,7 +1,7 @@
 import { Request, Response,NextFunction } from 'express';
 // import shopifyService from '../Services/shopifyService';
-import backmarketService from '../Services/backMarketService';
-import { syncCanceledOrders } from "../Services/backMarketService";
+import backmarketService from '../Services/orderService';
+import { syncCanceledOrders } from "../Services/orderService";
 
 
 // import new order as soon as they appear!

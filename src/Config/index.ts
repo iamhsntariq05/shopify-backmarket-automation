@@ -1,5 +1,7 @@
 
 import dotenv from 'dotenv';
+import Shopify from 'shopify-api-node';
+
 dotenv.config();
 
 export const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY || '';
@@ -21,6 +23,13 @@ export const BACKMARKET_HEADERS = {
     "X-Shopify-Access-Token":  SHOPIFY_API_TOKEN,
     "Content-Type": "application/json",
   };
+
+  export const shopify = new Shopify({
+    shopName: process.env.SHOPIFY_STORE_NAME as string,
+    apiKey:  process.env.SHOPIFY_API_KEY as string,
+    password: process.env.SHOPIFY_PASSWORD as string
+  });
+  
 
 
 

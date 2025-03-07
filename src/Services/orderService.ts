@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { BACKMARKET_API_URL, BACKMARKET_HEADERS,SHOPIFY_API_URL,SHOPIFY_HEADERS } from "../Config/index";
-import { shopify } from '../index';
+// import { shopify } from '../Config';
 
 
 const getOrder = async () => {

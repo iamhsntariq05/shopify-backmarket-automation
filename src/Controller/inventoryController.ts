@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import webhookService from "../Services/shopifyService";
+import webhookService from "../Services/inventoryService";
 
 
 //update inventory stock quantity when shopify stock quantity is changed

@@ -31,7 +31,7 @@ const cancelOrder = async (orderId: string) => {
         `${process.env.SHOPIFY_API_URL}/admin/api/2023-01/inventory_items/${inventoryItemId}.json`,
         {
           headers: {
-            "X-Shopify-Access-Token": process.env.SHOPIFY_ACCESS_TOKEN!,
+            "X-Shopify-Access-Token": process.env.SHOPIFY_ACCESS_TOKEN,
           },
         }
       );
