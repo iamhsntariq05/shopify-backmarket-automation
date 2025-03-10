@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { BACKMARKET_API_URL, BACKMARKET_HEADERS,SHOPIFY_API_URL,SHOPIFY_HEADERS } from "../Config/index";
+import { BACKMARKET_API_URL, AUTH_HEADER,SHOPIFY_API_URL,SHOPIFY_HEADERS } from "../Config/index";
 // import { shopify } from '../Config';
 
 
-const getOrder = async () => {
+const getShopifyProducts = async () => {
     try {
     const order =  await axios.get(`${BACKMARKET_API_URL}/ws/listings`, {
-        headers: BACKMARKET_HEADERS,
+        headers: AUTH_HEADER,
       });
       if (order.data.results) {
         return order.data.results
@@ -25,6 +25,29 @@ const getOrder = async () => {
       }
 };
 
+const getShopifyOrders = async () => {
+  try{
+    const shopifyUrl = `${process.env.SHOPIFY_API_URL}/admin/api/2023-04/orders.json`;
+    const SHOPIFY_HEADERS = {
+    "X-Shopify-Access-Token": process.env.SHOPIFY_ACCESS_TOKEN!,
+    "Content-Type": "application/json",
+  };
+  const response = await axios.get(shopifyUrl, { headers: SHOPIFY_HEADERS });
+  
+  if (!response.data.orders || response.data.orders.length === 0) {
+    return { success: true, message: "📂 No orders found.", data: [] };
+  }
+  return { success: true, message: "📦 Orders retrieved successfully.", data: response.data.orders };
+}
+catch (error: any) {
+  console.error("Error fetching Shopify orders:", error.response.data.errors);
+  return { success: false, message: "Error fetching Shopify orders", error :  error.response.data.errors };
+}
+}
+
+
+
+
 const updateBackMarketOrderStatus = async (
     shopifyOrderId: string,
     trackingNumber: string
@@ -41,7 +64,7 @@ const updateBackMarketOrderStatus = async (
           status: "sent",
           tracking_number: trackingNumber,
         },
-        { headers: BACKMARKET_HEADERS }
+        { headers: AUTH_HEADER}
       );
   
       return response.data;
@@ -54,7 +77,7 @@ const updateBackMarketOrderStatus = async (
   const findBackMarketOrder = async (shopifyOrderId: string) => {
     try {
       const response = await axios.get(`${BACKMARKET_API_URL}/ws/orders`, {
-        headers: BACKMARKET_HEADERS,
+        headers: AUTH_HEADER,
       });
   
       const orders = response.data.results || [];
@@ -71,7 +94,7 @@ const updateBackMarketOrderStatus = async (
   export const getCanceledBackMarketOrders = async () => {
     try {
       const response = await axios.get(`${BACKMARKET_API_URL}/ws/orders?status=canceled`, {
-        headers: BACKMARKET_HEADERS,
+        headers: AUTH_HEADER,
       });
   
       return response.data.results || [];
@@ -110,4 +133,4 @@ const updateBackMarketOrderStatus = async (
     }
   };
 
-export default { getOrder, updateBackMarketOrderStatus };
+export default { getShopifyProducts, updateBackMarketOrderStatus, getShopifyOrders };

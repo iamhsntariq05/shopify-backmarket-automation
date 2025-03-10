@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import axios from 'axios';
+import { syncBackMarketInventory } from "../Middleware/inventoryUpdate";
 
 dotenv.config();
 
@@ -92,7 +93,7 @@ const mapOrderToBackMarket = (order: any) => {
     }
   };
   
-  const updateInventory = async (inventoryItemId: number, shopifyQuantity: number) => {
+  const updateInventory = async (inventoryItemId: any,sku: any, quantity: any) => {
     const shopifySku = await getShopifySku(inventoryItemId);
     if (!shopifySku) {
       return {
@@ -100,44 +101,66 @@ const mapOrderToBackMarket = (order: any) => {
         message: "No SKU found for inventory item",
       };
     }
-    await mapShopifySkuToBackMarketSkus(shopifySku, shopifyQuantity);
+    await syncBackMarketInventory(sku, quantity);
+    return {
+      success: true,
+      message: "Inventory updated successfully",
+    };
+    
   };
   
-  const mapShopifySkuToBackMarketSkus = async (shopifySku: string, shopifyQuantity: number) => {
-    try {
-      const response = await axios.get(`${process.env.BACKMARKET_API_URL}/bm/catalog/listings`, {
-        headers: { Authorization: `Bearer ${process.env.BACKMARKET_ACCESS_TOKEN}` },
-        params: { sku: shopifySku },
-      });
+  // const syncBackMarketInventory = async (shopifySku: string, shopifyQuantity: number) => {
+  //   try {
+  //     const response = await axios.get(`${process.env.BACKMARKET_API_URL}/bm/catalog/listings`, {
+  //       headers: BACKMARKET_HEADERS,
+  //       params: { sku: shopifySku },
+  //     });
   
-      if (response.data.count === 0) {
-        console.warn(`No BackMarket products found for SKU: ${shopifySku}`);
-        return;
-      }
+  //     if (response.data.count === 0) {
+  //       console.log(`${shopifySku} not found`);
+  //       return;
+  //     }
   
-      await Promise.all(
-        response.data.results.map((product:any) =>
-          updateBackMarketInventory(product.id, shopifyQuantity)
-        )
-      );
-    } catch (error) {
-      console.error(`Error mapping Shopify SKU: ${shopifySku}`, error);
-    }
-  };
+  //     await Promise.all(
+  //       response.data.results.map((product:any) =>
+  //         updateBackMarketInventory(product.id, shopifyQuantity)
+  //       )
+  //     );
+  //   } catch (error) {
+  //     console.error(`Error mapping Shopify SKU: ${shopifySku}`, error);
+  //   }
+  // };
   
-  const updateBackMarketInventory = async (productId: number, newQuantity: number) => {
-    try {
-      await axios.patch(
-        `${process.env.BACKMARKET_API_URL}/bm/catalog/listings/${productId}`,
-        { quantity: newQuantity },
-        { headers: { Authorization: `Bearer ${process.env.BACKMARKET_ACCESS_TOKEN}` } }
-      );
+  // const updateBackMarketInventory = async (productId: any, quantity: any) => {
+  //   try {
+
+  //     const updateUrl = `${process.env.BACKMARKET_API_URL}/ws/listings/${productId}`;
+  //     const payload = { quantity: quantity };
+
+  //     const response = await axios.post(updateUrl, payload, {
+  //       headers: BACKMARKET_HEADERS,
+  //     });
+
+  //     if (![200, 201].includes(response.status)) {
+  //       console.error(`❌ Failed to update inventory for product ID: ${productId}`);
+  //       return { productId, updated: false, message: `Failed to update inventory for product ID: ${productId}` };
+  //     }
+  //     console.log(`✅ Successfully updated product ID: ${productId} to quantity: ${quantity}`);
+  //     return { productId, updated: true, message: `Updated product ID: ${productId} to quantity: ${quantity}` };
+
+  //     // await axios.patch(
+  //     //   `${process.env.BACKMARKET_API_URL}/bm/catalog/listings/${productId}`,
+  //     //   { quantity: newQuantity },
+  //     //   { headers: { Authorization: `Bearer ${process.env.BACKMARKET_ACCESS_TOKEN}` } }
+  //     // );
   
-      console.log(`Inventory updated for BackMarket Product ID: ${productId}`);
-    } catch (error) {
-      console.error(`Failed to update inventory for Product ID: ${productId}`, error);
-    }
-  };
+  //     console.log(`Inventory updated for BackMarket Product ID: ${productId}`);
+  //   } catch (error) {
+  //     console.error(`Failed to update inventory for Product ID: ${productId}`, error);
+  //   }
+  // };
+
+  
 
 
 

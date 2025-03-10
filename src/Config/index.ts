@@ -1,6 +1,5 @@
 
 import dotenv from 'dotenv';
-import Shopify from 'shopify-api-node';
 
 dotenv.config();
 
@@ -13,7 +12,7 @@ export const BACKMARKET_CREDENTIAL = Buffer.from(`${process.env.BACKMARKET_EMAIL
 export const BACKMARKET_API_URL = process.env.BACKMARKET_API_URL ||'';
 export const SHOPIFY_API_URL = process.env.SHOPIFY_API_URL || '';
 
-export const BACKMARKET_HEADERS = {
+export const AUTH_HEADER= {
     Authorization: `Basic ${BACKMARKET_CREDENTIAL}`,
     Accept: 'application/json',
     'Accept-Language': 'fr-fr',
