@@ -4,7 +4,6 @@ import { importShopifyProducts,importShopifyOrder, updateOrderStatus,syncCancele
 const router = express.Router();
 
 router.get('/import-products', importShopifyProducts);
-router.get('/create-orders', importShopifyProducts);
 router.get('/import-orders', importShopifyOrder);
 router.post('/update-status', updateOrderStatus);
 
