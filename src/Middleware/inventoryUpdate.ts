@@ -18,7 +18,7 @@ const syncBackMarketInventory = async (shopifySku: string, shopifyQuantity: numb
   
       const data = await Promise.all(
         response.data.results.map((product:any) =>
-          backMarketInventoryUpdate(product.id, shopifyQuantity)
+          backMarketinventoryUpdate(product.id, shopifyQuantity)
         )
       );
       console.log(data);
@@ -37,7 +37,7 @@ const syncBackMarketInventory = async (shopifySku: string, shopifyQuantity: numb
     }
   };
   
-  const backMarketInventoryUpdate = async (productId: any, quantity: any) => {
+  const backMarketinventoryUpdate = async (productId: any, quantity: any) => {
     try {
 
       const updateUrl = `${process.env.BACKMARKET_API_URL}/ws/listings/${productId}`;

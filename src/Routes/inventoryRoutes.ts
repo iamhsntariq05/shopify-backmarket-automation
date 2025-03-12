@@ -1,9 +1,9 @@
 import express from 'express';
-import InventoryUpdate  from '../Controller/inventoryController';
+import inventoryUpdate  from '../Controller/inventoryController';
 
 
 const router = express.Router();
-router.post("/sync", InventoryUpdate);
+router.post("/sync", inventoryUpdate);
 
 
 export default router;

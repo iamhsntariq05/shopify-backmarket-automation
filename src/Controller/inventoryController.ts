@@ -4,7 +4,7 @@ import webhookService from "../Services/inventoryService";
 
 //update inventory stock quantity when shopify stock quantity is changed
 
-const InventoryUpdate = async (req: Request, res: Response) => {
+const inventoryUpdate = async (req: Request, res: Response) => {
   try {
     const variant = req.body.variants && req.body.variants[0];
     if (!variant) {
@@ -27,4 +27,4 @@ const InventoryUpdate = async (req: Request, res: Response) => {
 };
 
 
-  export default InventoryUpdate;
+  export default inventoryUpdate;

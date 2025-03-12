@@ -4,7 +4,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import routes from './Routes'
 import {notFoundErrorHandle} from './Middleware/'
-import syncBackMarketOrdersToShopify from './Services/inventoryService'
 
 
 dotenv.config();
