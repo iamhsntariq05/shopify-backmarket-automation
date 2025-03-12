@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
 import axios from 'axios';
+const cron = require("node-cron")
 import { syncBackMarketInventory } from "../Middleware/inventoryUpdate";
+import fs from "fs/promises";
+import path from "path";
 
 dotenv.config();
 
@@ -108,60 +111,162 @@ const mapOrderToBackMarket = (order: any) => {
     };
     
   };
+
+  const fetchBackMarketOrders = async () => {
+    try {
+
+      // const authHeader = Buffer.from(`${process.env.BACKMARKET_EMAIL}:${process.env.BACKMARKET_PASSWORD}`).toString("base64");
+      //   const response = await axios.get(`${process.env.BACKMARKET_API_URL}/ws/orders`, {
+      //     headers: {
+      //       "Authorization": `Basic ${authHeader}`,
+      //       "Content-Type": "application/json",
+      //       "Accept": "application/json",
+      //       "User-Agent": "MyApp/1.0"
+      //   }
+      //   });
+      const filePath = path.join(__dirname, "../order.json");
+
+      const data = await fs.readFile(filePath, "utf-8");
+      const orders = JSON.parse(data);
+
+        // const newOrders = response.data.filter((order: any) => order.status === "To be processed");
+        const newOrders = orders.results.filter((order: any) => order.state === 3);
+        return newOrders;
+    } catch (error) {
+        console.error("Error fetching BackMarket orders:", error);
+        return error;
+    }
+};
+
+const updateBackMarketOrderStatus = async (orderId: any) => {
+  try {
+    // const authHeader = Buffer.from(`${process.env.BACKMARKET_EMAIL}:${process.env.BACKMARKET_PASSWORD}`).toString("base64");
+
+    //   await axios.put(
+    //       `${process.env.BACKMARKET_API_URL}/orders/${orderId}`,
+    //       { status: "To be shipped" },
+    //       {
+    //         headers: {
+    //           "Authorization": `Basic ${authHeader}`,
+    //           "Content-Type": "application/json",
+    //           "Accept": "application/json",
+    //           "User-Agent": "MyApp/1.0"
+    //       }
+    //       }
+    //   );
+    const orderFilePath = path.join(__dirname, "../order.json");
+    const data = await fs.readFile(orderFilePath, "utf-8");
+    const orders = JSON.parse(data); // Ensure this is an object
+
+    // Update the order's state inside results array
+    const updatedOrders = {
+      ...orders, // Keep other properties
+      results: orders.results.map((order: any) =>
+        order.order_id === orderId ? { ...order, state: 10 } : order
+      ),
+    };
+
+    await fs.writeFile(orderFilePath, JSON.stringify(updatedOrders, null, 2), "utf-8");
+    return updatedOrders;
+  } catch (error) {
+      console.error(`❌ Failed to update order ${orderId} status:`, error);
+  }
+};
+const convertBackMarketSkuToShopifySku = (bmSku: string) => {
+  return bmSku.split("/")[0];
+};
+
+const createShopifyOrder = async (order: any) => {
+  const lineItems = order.orderlines.map((item: any) => ({
+      sku: convertBackMarketSkuToShopifySku(item.listing),
+      quantity: item.quantity,
+  }));
+
+  try {
+    const response = await axios.post(
+      `${process.env.SHOPIFY_API_URL}/admin/api/2024-01/orders.json`,
+      {
+          order: {
+              email: `${order.billing_address.firstName}${order.billing_address.lastName}@gmail.com`,
+              financial_status: "paid",
+              test: false, 
+              processed_at: new Date().toISOString(),
+              customer: {
+                  first_name: order.billing_address.firstName,
+                  last_name: order.billing_address.lastName,
+                  email: `${order.billing_address.firstName}${order.billing_address.lastName}@gmail.com`,
+                  phone: order.billing_address.phoneNumber  || "",
+              },
+              line_items: order.orderlines.map((item: any) => ({
+                  title: item.product || "Default Product Title", 
+                  quantity: item.quantity || 1,
+                  price: item.price || 0, 
+                  variant_id: item.variant_id || null,
+                  sku: convertBackMarketSkuToShopifySku(item.listing) || "",
+              })),
+              shipping_address: {
+                  first_name: order.billing_address.firstName,
+                  last_name: order.billing_address.lastName,
+                  address1: order.billing_address.street,
+                  address2: order.billing_address.street2  || "",
+                  city: order.billing_address.city,
+                  province: order.billing_address.state  || "",
+                  country: order.billing_address.country,
+                  zip: order.billing_address.zip?.toString() || "75001",
+                  phone: order.billing_address.phoneNumber  || "",
+              },
+              billing_address: {
+                  first_name: order.billing_address.firstName,
+                  last_name: order.billing_address.lastName,
+                  address1: order.billing_address.address1,
+                  address2: order.billing_address.address2 || "",
+                  city: order.billing_address.city,
+                  province: order.billing_address.state || "",
+                  country: order.billing_address.country,
+                  zip: order.billing_address.zip,
+                  phone: order.billing_address.phoneNumber || "",
+              },
+              fulfillment_status: "unfulfilled",
+          },
+      },
+      {
+          headers: {
+              "X-Shopify-Access-Token": process.env.SHOPIFY_ACCESS_TOKEN,
+              "Content-Type": "application/json",
+          },
+      }
+  );
+//    if (order.tracking_number) {
+//     await createFulfillment(response.data.order.id, order.tracking_number, order.shipping_carrier);
+// }
   
-  // const syncBackMarketInventory = async (shopifySku: string, shopifyQuantity: number) => {
-  //   try {
-  //     const response = await axios.get(`${process.env.BACKMARKET_API_URL}/bm/catalog/listings`, {
-  //       headers: BACKMARKET_HEADERS,
-  //       params: { sku: shopifySku },
-  //     });
-  
-  //     if (response.data.count === 0) {
-  //       console.log(`${shopifySku} not found`);
-  //       return;
-  //     }
-  
-  //     await Promise.all(
-  //       response.data.results.map((product:any) =>
-  //         updateBackMarketInventory(product.id, shopifyQuantity)
-  //       )
-  //     );
-  //   } catch (error) {
-  //     console.error(`Error mapping Shopify SKU: ${shopifySku}`, error);
-  //   }
-  // };
-  
-  // const updateBackMarketInventory = async (productId: any, quantity: any) => {
-  //   try {
 
-  //     const updateUrl = `${process.env.BACKMARKET_API_URL}/ws/listings/${productId}`;
-  //     const payload = { quantity: quantity };
-
-  //     const response = await axios.post(updateUrl, payload, {
-  //       headers: BACKMARKET_HEADERS,
-  //     });
-
-  //     if (![200, 201].includes(response.status)) {
-  //       console.error(`❌ Failed to update inventory for product ID: ${productId}`);
-  //       return { productId, updated: false, message: `Failed to update inventory for product ID: ${productId}` };
-  //     }
-  //     console.log(`✅ Successfully updated product ID: ${productId} to quantity: ${quantity}`);
-  //     return { productId, updated: true, message: `Updated product ID: ${productId} to quantity: ${quantity}` };
-
-  //     // await axios.patch(
-  //     //   `${process.env.BACKMARKET_API_URL}/bm/catalog/listings/${productId}`,
-  //     //   { quantity: newQuantity },
-  //     //   { headers: { Authorization: `Bearer ${process.env.BACKMARKET_ACCESS_TOKEN}` } }
-  //     // );
-  
-  //     console.log(`Inventory updated for BackMarket Product ID: ${productId}`);
-  //   } catch (error) {
-  //     console.error(`Failed to update inventory for Product ID: ${productId}`, error);
-  //   }
-  // };
-
-  
+      console.log(`✅ Order imported into Shopify with ID: ${response.data.order.id}`);
+      return response.data.order;
+  } catch (error) {
+      console.error("❌ Failed to import order into Shopify:", error);
+      return null;
+  }
+};
 
 
 
-export default { mapOrderToBackMarket, syncInventoryWithBackMarket,updateInventory};
+  const syncBackMarketOrdersToShopify = async () => {
+    console.log("🔄 Checking for new BackMarket orders...");
+
+    const orders = await fetchBackMarketOrders();
+
+    for (const order of orders) {
+      //  const Updatedorder =  await updateBackMarketOrderStatus(order.order_id );
+        const shopifyOrder = await createShopifyOrder(order);
+        console.log("🔄 Synced order:", shopifyOrder);
+    }
+};
+
+// const cronJobFunctions = async () => {
+//   await syncBackMarketOrdersToShopify();
+// };
+
+// cron.schedule('*/10 * * * * *', syncBackMarketOrdersToShopify); 
+ 
+export default { mapOrderToBackMarket, syncInventoryWithBackMarket,updateInventory,syncBackMarketOrdersToShopify};

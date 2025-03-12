@@ -16,13 +16,24 @@ const syncBackMarketInventory = async (shopifySku: string, shopifyQuantity: numb
         return;
       }
   
-      await Promise.all(
+      const data = await Promise.all(
         response.data.results.map((product:any) =>
           backMarketInventoryUpdate(product.id, shopifyQuantity)
         )
       );
+      console.log(data);
+      return data;
     } catch (error) {
       console.error(`Error mapping Shopify SKU: ${shopifySku}`, error);
+    }
+  };
+
+  const syncShopifyInventory = async ( shopifyQuantity: number, inventory_item_id : number) => {
+    try {
+  
+      await updateShopifyStock(shopifyQuantity, inventory_item_id);
+    } catch (error) {
+      console.error("Error reducing Shopify stock:", error);
     }
   };
   
@@ -48,4 +59,25 @@ const syncBackMarketInventory = async (shopifySku: string, shopifyQuantity: numb
     }
   };
 
-  export {syncBackMarketInventory};
+
+  async function updateShopifyStock(inventoryItemId: any, newQuantity: number) {
+    try {
+      const response = await axios.post(
+        `${process.env.SHOPIFY_API_URL}/admin/api/2024-01/inventory_levels/set.json`,
+        {
+          location_id: process.env.SHOPIFY_LOCATION_ID,
+          inventory_item_id: inventoryItemId,
+          available: newQuantity,
+        },
+        {
+          headers: { "X-Shopify-Access-Token": process.env.SHOPIFY_ACCESS_TOKEN },
+        }
+      );
+      console.log(`Shopify stock updated: ${newQuantity}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating Shopify stock:", error);
+    }
+  }
+
+  export {syncBackMarketInventory,syncShopifyInventory};

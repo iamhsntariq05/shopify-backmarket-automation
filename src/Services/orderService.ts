@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { BACKMARKET_API_URL, AUTH_HEADER,SHOPIFY_API_URL,SHOPIFY_HEADERS } from "../Config/index";
+import { syncBackMarketInventory, syncShopifyInventory } from '../Middleware/inventoryUpdate';
 // import { shopify } from '../Config';
 
 
@@ -133,4 +134,22 @@ const updateBackMarketOrderStatus = async (
     }
   };
 
-export default { getShopifyProducts, updateBackMarketOrderStatus, getShopifyOrders };
+
+   const syncInventory = async (sku: any, quantity: any, inventory_item_id: any) => {
+    
+    await syncBackMarketInventory(sku, quantity);
+    await syncShopifyInventory(inventory_item_id,quantity);
+    return {
+      success: true,
+      message: "Inventory updated successfully",
+    };
+    
+  };
+
+
+  
+
+
+
+
+export default { getShopifyProducts, updateBackMarketOrderStatus, getShopifyOrders,syncInventory };
