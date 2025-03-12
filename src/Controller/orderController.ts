@@ -109,29 +109,29 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     }
   };
 
-  const getInventoryStock = async (variantId: number): Promise<any | null> => {
-    const shopifyAccessToken = process.env.SHOPIFY_ACCESS_TOKEN;
-    const shopifyUrl = `${process.env.SHOPIFY_API_URL}/admin/api/2024-01/variants/${variantId}.json`;
+  // const getInventoryStock = async (variantId: number): Promise<any | null> => {
+  //   const shopifyAccessToken = process.env.SHOPIFY_ACCESS_TOKEN;
+  //   const shopifyUrl = `${process.env.SHOPIFY_API_URL}/admin/api/2024-01/variants/${variantId}.json`;
   
-    try {
-      const response = await axios.get(shopifyUrl, {
-        headers: {
-          "X-Shopify-Access-Token": shopifyAccessToken,
-          "Content-Type": "application/json",
-        },
-      });
+  //   try {
+  //     const response = await axios.get(shopifyUrl, {
+  //       headers: {
+  //         "X-Shopify-Access-Token": shopifyAccessToken,
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
   
-      let inventory_quantity : number = response.data.variant.inventory_quantity;
-      let inventory_item_id : number = response.data.variant.inventory_item_id;
-      const data :any = {
-        inventory_quantity,
-        inventory_item_id
-      }
-      return data;
-    } catch (error) {
-      return null;
-    }
-  };
+  //     let inventory_quantity : number = response.data.variant.inventory_quantity;
+  //     let inventory_item_id : number = response.data.variant.inventory_item_id;
+  //     const data :any = {
+  //       inventory_quantity,
+  //       inventory_item_id
+  //     }
+  //     return data;
+  //   } catch (error) {
+  //     return null;
+  //   }
+  // };
 
   const getProductBySKU = async (sku: string): Promise<any | null> => {
     const shopifyAccessToken = process.env.SHOPIFY_ACCESS_TOKEN;

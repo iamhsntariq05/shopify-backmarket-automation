@@ -130,7 +130,7 @@ const mapOrderToBackMarket = (order: any) => {
       const orders = JSON.parse(data);
 
         // const newOrders = response.data.filter((order: any) => order.status === "To be processed");
-        const newOrders = orders.results.filter((order: any) => order.state === 3);
+        const newOrders = orders.results.filter((order: any) => order.state === 10);
         return newOrders;
     } catch (error) {
         console.error("Error fetching BackMarket orders:", error);
@@ -156,13 +156,12 @@ const updateBackMarketOrderStatus = async (orderId: any) => {
     //   );
     const orderFilePath = path.join(__dirname, "../order.json");
     const data = await fs.readFile(orderFilePath, "utf-8");
-    const orders = JSON.parse(data); // Ensure this is an object
+    const orders = JSON.parse(data);
 
-    // Update the order's state inside results array
     const updatedOrders = {
-      ...orders, // Keep other properties
+      ...orders,
       results: orders.results.map((order: any) =>
-        order.order_id === orderId ? { ...order, state: 10 } : order
+        order.order_id === orderId ? { ...order, state: 3 } : order
       ),
     };
 
@@ -257,16 +256,11 @@ const createShopifyOrder = async (order: any) => {
     const orders = await fetchBackMarketOrders();
 
     for (const order of orders) {
-      //  const Updatedorder =  await updateBackMarketOrderStatus(order.order_id );
-        const shopifyOrder = await createShopifyOrder(order);
+      const shopifyOrder = await createShopifyOrder(order);
+      const data = await updateBackMarketOrderStatus(order.order_id );
         console.log("🔄 Synced order:", shopifyOrder);
     }
 };
-
-// const cronJobFunctions = async () => {
-//   await syncBackMarketOrdersToShopify();
-// };
-
-// cron.schedule('*/10 * * * * *', syncBackMarketOrdersToShopify); 
+cron.schedule('*/10 * * * * *', syncBackMarketOrdersToShopify); 
  
 export default { mapOrderToBackMarket, syncInventoryWithBackMarket,updateInventory,syncBackMarketOrdersToShopify};
